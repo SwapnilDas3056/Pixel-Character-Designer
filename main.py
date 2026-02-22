@@ -4,6 +4,8 @@ pg.font.init()
 import pygame_widgets as pw
 from pygame_widgets.textbox import TextBox
 
+import asyncio
+
 from scripts import buttonFunc as bF
 from scripts import character as ch
 from scripts import coloring as clr
@@ -29,7 +31,30 @@ font_styleText = pg.font.Font(gameFont, size=30)
 nameText = font_nameText.render("Name:", False, "black")
 featureTextList = [font_styleText.render(featureName.replace("\n", " "), False, "black") for featureName in fDict["Feature Name"]]
 
-def main():
+def create_Filledrect(surface, fillColor, outlineColor, rect, width=0, border_radius=0):
+    pg.draw.rect(surface, fillColor, rect, 0, border_radius)
+    pg.draw.rect(surface, outlineColor, rect, width, border_radius)
+
+def change_name(textBox):
+    global charName
+    charName = textBox.getText()
+    print("Name entered:", charName)
+    return charName
+
+def draw_feature(stI):
+    global screen
+    styleImg = fDict["Style Images"][stI]
+    styleImg = clr.palette_swap(styleImg, pg.Color(clr.colList_styles[bF.colList[stI]]), mode=fDict["Color Mode"][stI-1])
+    screen.blit(styleImg, (375, 70), pg.Rect(ch.returnCrop(bF.style[stI]),(144,240)))
+
+def saveChara():
+    global screen
+    character = screen.subsurface(pg.Rect((375,70),(144,240)))
+    charImg = pg.transform.scale(character, (576, 960))
+    global charName
+    pg.image.save(charImg, charName+".png")
+
+async def main():
     # pygame setup
     pg.init()
     global screen
@@ -118,31 +143,12 @@ def main():
 
         delta_time = clock.tick(60) * 0.001
         delta_time = max(0.001, min(0.1, delta_time))
+        await asyncio.sleep(0)
 
     pg.quit()
 
-def create_Filledrect(surface, fillColor, outlineColor, rect, width=0, border_radius=0):
-    pg.draw.rect(surface, fillColor, rect, 0, border_radius)
-    pg.draw.rect(surface, outlineColor, rect, width, border_radius)
-
-def change_name(textBox):
-    global charName
-    charName = textBox.getText()
-    print("Name entered:", charName)
-    return charName
-
-def draw_feature(stI):
-    global screen
-    styleImg = fDict["Style Images"][stI]
-    styleImg = clr.palette_swap(styleImg, pg.Color(clr.colList_styles[bF.colList[stI]]), mode=fDict["Color Mode"][stI-1])
-    screen.blit(styleImg, (375, 70), pg.Rect(ch.returnCrop(bF.style[stI]),(144,240)))
-
-def saveChara():
-    global screen
-    character = screen.subsurface(pg.Rect((375,70),(144,240)))
-    charImg = pg.transform.scale(character, (576, 960))
-    global charName
-    pg.image.save(charImg, charName+".png")
 
 if __name__ == "__main__":
     main()
+
+asyncio.run(main())
