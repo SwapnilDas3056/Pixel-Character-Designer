@@ -118,7 +118,7 @@ def main():
 
         delta_time = clock.tick(60) * 0.001
         delta_time = max(0.001, min(0.1, delta_time))
-    saveChara()
+
     pg.quit()
 
 def create_Filledrect(surface, fillColor, outlineColor, rect, width=0, border_radius=0):
